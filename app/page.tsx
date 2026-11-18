@@ -13,6 +13,33 @@ const prompts: Record<Mode, string[]> = {
   scholar: ["Explain a big idea in a simple way", "Help me learn something fascinating", "Compare two ideas I keep mixing up"],
 };
 
+const creativeChallenges = [
+  {
+    label: "OBJECT POETRY",
+    title: "Give a forgotten object a secret life.",
+    detail: "Pick something ordinary nearby. Imagine the world it has seen.",
+    prompt: "Help me turn an ordinary object near me into a tiny story with a secret life, a surprising detail, and a hopeful ending.",
+  },
+  {
+    label: "TINY WORLDS",
+    title: "Design a festival for the very small.",
+    detail: "Think beetles, buttons, raindrops, and one very tiny parade.",
+    prompt: "Invent a whimsical festival for tiny creatures living in a garden. Give it a name, three strange traditions, and one unforgettable parade float.",
+  },
+  {
+    label: "COLOR STORY",
+    title: "Make a color feel like a place.",
+    detail: "Choose a color and build a place you could step right into.",
+    prompt: "Help me imagine a place made from the color coral. Describe its sounds, its weather, one person who lives there, and a small mystery to explore.",
+  },
+  {
+    label: "WHAT IF…",
+    title: "Give the moon a new job.",
+    detail: "A small twist of the familiar can open a whole new universe.",
+    prompt: "Imagine the moon has a new job besides lighting the night. Give me three surprising possibilities, then build one into a vivid little scene.",
+  },
+];
+
 const modeDetails: Record<Mode, { label: string; eyebrow: string; title: string; description: string }> = {
   spark: { label: "Spark", eyebrow: "YOUR CREATIVE SIDEKICK", title: "Let's make something\nunexpected.", description: "Bring a half-formed thought. Leave with a little momentum." },
   focus: { label: "Focus", eyebrow: "YOUR CALM CO-PILOT", title: "One clear step\nchanges everything.", description: "Untangle the to-do list and find your next small win." },
@@ -50,6 +77,7 @@ export default function Home() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [savedLoaded, setSavedLoaded] = useState(false);
   const [notice, setNotice] = useState("");
+  const [challengeIndex, setChallengeIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -67,6 +95,7 @@ export default function Home() {
   const { messages, sendMessage, status, error, setMessages } = useChat({ transport });
   const busy = status === "submitted" || status === "streaming";
   const activeMode = modeDetails[mode];
+  const creativeChallenge = creativeChallenges[challengeIndex];
 
   useEffect(() => {
     function onShortcut(event: globalThis.KeyboardEvent) {
@@ -140,6 +169,10 @@ export default function Home() {
     inputRef.current?.focus();
   }
 
+  function shuffleChallenge() {
+    setChallengeIndex((current) => (current + 1 + Math.floor(Math.random() * (creativeChallenges.length - 1))) % creativeChallenges.length);
+  }
+
   return (
     <main className={`app-shell ${mobileOpen ? "menu-open" : ""}`}>
       {mobileOpen && <button className="mobile-backdrop" onClick={() => setMobileOpen(false)} aria-label="Close navigation" />}
@@ -196,6 +229,11 @@ export default function Home() {
               <div className="prompt-zone">
                 <div className="prompt-heading"><span>TRY A LITTLE SOMETHING</span><span className="prompt-line" /></div>
                 <div className="prompt-grid">{prompts[mode].map((prompt, index) => <button className="prompt-card" key={prompt} onClick={() => { setInput(prompt); inputRef.current?.focus(); }}><span className={`prompt-index index-${index}`}>0{index + 1}</span><span>{prompt}</span><Icon name="arrow" size={16} /></button>)}</div>
+                <article className="challenge-card" aria-label="Creative challenge">
+                  <div className="challenge-orbit" aria-hidden="true"><Icon name="spark" size={22} /></div>
+                  <div className="challenge-copy"><span className="challenge-label">A LITTLE CREATIVE DETOUR <i /> {creativeChallenge.label}</span><strong>{creativeChallenge.title}</strong><p>{creativeChallenge.detail}</p></div>
+                  <div className="challenge-actions"><button type="button" className="challenge-shuffle" onClick={shuffleChallenge}>Another idea</button><button type="button" className="challenge-try" onClick={() => { setInput(creativeChallenge.prompt); inputRef.current?.focus(); }}>Try this spark <Icon name="arrow" size={15} /></button></div>
+                </article>
               </div>
             </section>
           ) : (
