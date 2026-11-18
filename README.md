@@ -24,9 +24,11 @@ Jervious is a small, thoughtful AI workspace powered by Claude. Bring it a quest
 
    ```env
    AI_GATEWAY_API_KEY=your_key_here
+   UPSTASH_REDIS_REST_URL=https://your-database.upstash.io
+   UPSTASH_REDIS_REST_TOKEN=your_upstash_redis_rest_token
    ```
 
-   Create a key from [Vercel AI Gateway](https://vercel.com/ai-gateway). Keep `.env.local` private; Git ignores it.
+   Create a key from [Vercel AI Gateway](https://vercel.com/ai-gateway), then create a Redis database at [Upstash](https://upstash.com/) and copy its REST URL and token. Keep `.env.local` private; Git ignores it. Local development uses an in-memory limit if the Upstash values are missing.
 
 5. Start Jervious:
 
@@ -49,7 +51,7 @@ Without a key, the interface still opens, but sending a chat message returns a s
 
 ## Put the app online
 
-Jervious needs a server runtime for its Claude API route. For a live app, import the GitHub repository into Vercel, add `AI_GATEWAY_API_KEY` to the project’s environment variables, then deploy. A static GitHub Pages site cannot run the chat API route. If you make the app public, set a usage limit for your Gateway key or add sign-in and persistent rate limiting before inviting broad traffic.
+Jervious needs a server runtime for its Claude API route. For a live app, import the GitHub repository into Vercel, add `AI_GATEWAY_API_KEY`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` to the project’s environment variables, then deploy. The API allows 10 chat requests per minute per IP address; production requests fail closed if the Upstash rate limiter is unavailable or not configured. A static GitHub Pages site cannot run the chat API route. Set a usage limit for your Gateway key before inviting broad traffic.
 
 ## Change the Claude model
 
